@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Birthdays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF8F2;
+    --panel:#FFFFFF;
+    --ink:#4A3F55;
+    --ink-soft:#8A7F97;
+    --pink:#FFB7C5;
+    --pink-d:#D96B85;
+    --mint:#AEE6C8;
+    --mint-d:#4E9B77;
+    --lilac:#D9C9F2;
+    --lilac-d:#8264B8;
+    --peach:#FFD3A0;
+    --peach-d:#D98A3D;
+    --sky:#AEDDF5;
+    --sky-d:#4A93BE;
+    --butter:#FFE79E;
+    --butter-d:#C79A2A;
+    --line:rgba(74,63,85,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Quicksand',sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:36px 20px 56px;}
+  .eyebrow{font-family:'Baloo 2',sans-serif;font-weight:600;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--pink-d);margin:0 0 4px;}
+  h1{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:36px;margin:0 0 6px;color:var(--ink);}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 26px;}
+
+  .next-row{display:flex;gap:14px;overflow-x:auto;padding:4px 4px 18px;margin-bottom:8px;}
+  .next-card{flex:0 0 auto;background:var(--panel);border-radius:18px;padding:14px 18px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 0 var(--line);min-width:160px;}
+  .next-card .cupc{width:42px;height:46px;flex-shrink:0;}
+  .next-card .nc-name{font-family:'Baloo 2',sans-serif;font-weight:600;font-size:14px;}
+  .next-card .nc-when{font-size:12px;color:var(--ink-soft);}
+  .next-empty{color:var(--ink-soft);font-size:13px;padding:8px 4px;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:28px;}
+  .month-card{border-radius:18px;padding:14px 14px 10px;min-height:120px;}
+  .month-head{font-family:'Baloo 2',sans-serif;font-weight:600;font-size:15px;margin:0 0 10px;}
+  .cupcakes{display:flex;flex-wrap:wrap;gap:10px;}
+  .cc-item{display:flex;flex-direction:column;align-items:center;width:52px;cursor:default;}
+  .cc-item svg{width:40px;height:44px;}
+  .cc-name{font-size:10px;text-align:center;margin-top:2px;line-height:1.15;color:var(--ink);font-weight:600;max-width:52px;overflow-wrap:anywhere;}
+  .month-empty{font-size:12px;color:var(--ink-soft);opacity:0.7;}
+
+  .panel{background:var(--panel);border-radius:18px;padding:20px;box-shadow:0 2px 0 var(--line);}
+  .list-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+  h2{font-family:'Baloo 2',sans-serif;font-weight:600;font-size:17px;margin:0;}
+  .count{font-size:12px;color:var(--ink-soft);}
+  .person{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);}
+  .person:last-child{border-bottom:none;}
+  .p-name{flex:1;font-size:14px;font-weight:600;}
+  .p-date{font-size:12px;color:var(--ink-soft);margin-right:6px;}
+  .p-when{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--bg);color:var(--ink-soft);white-space:nowrap;}
+  .p-when.today{background:var(--pink);color:#5c1a2c;}
+  .p-when.soon{background:var(--butter);color:#5c4408;}
+  .del{opacity:0;background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:16px;padding:0 4px;transition:opacity .12s;}
+  .person:hover .del{opacity:1;}
+  .del:hover{color:var(--pink-d);}
+  .empty{color:var(--ink-soft);font-size:13px;padding:16px 4px;text-align:center;}
+
+  form{display:grid;grid-template-columns:1fr 100px 64px auto;gap:8px;margin-top:16px;}
+  input,select{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:9px 10px;font-family:'Quicksand',sans-serif;font-weight:600;font-size:13px;}
+  input:focus,select:focus{outline:2px solid var(--lilac);}
+  button.add{background:var(--pink);border:none;border-radius:10px;color:#5c1a2c;font-weight:700;font-size:13px;cursor:pointer;padding:0 16px;font-family:'Baloo 2',sans-serif;}
+  button.add:hover{filter:brightness(1.05);}
+  button.add:disabled{opacity:0.6;cursor:not-allowed;}
+  .err{grid-column:1/-1;font-size:12px;color:var(--pink-d);display:none;}
+  .foot-note{font-size:11px;color:var(--ink-soft);margin-top:10px;}
+  .export-row{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  button.export{background:var(--sky);border:none;border-radius:10px;color:#0f3d54;font-weight:700;font-size:13px;cursor:pointer;padding:9px 16px;font-family:'Baloo 2',sans-serif;}
+  button.export:hover{filter:brightness(1.05);}
+  .subscribe-box{margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--ink-soft);word-break:break-all;}
+  .subscribe-box b{color:var(--ink);}
+  .export-note{font-size:12px;color:var(--ink-soft);}
+  .glow{animation:glow 2.2s ease-in-out infinite;}
+  @keyframes glow{0%,100%{filter:drop-shadow(0 0 0 transparent);}50%{filter:drop-shadow(0 0 5px rgba(255,183,197,0.9));}}
+  @media(prefers-reduced-motion:reduce){.glow{animation:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Candy calendar</p>
+  <h1>Team birthdays</h1>
+  <p class="sub">One cupcake per person, shelved by month. Shared with everyone who opens this page.</p>
+
+  <div class="next-row" id="nextRow"></div>
+
+  <div class="grid" id="monthGrid"></div>
+
+  <div class="panel">
+    <div class="list-head">
+      <h2>Everyone</h2>
+      <span class="count" id="count"></span>
+    </div>
+    <div id="list"></div>
+
+    <form id="addForm">
+      <input type="text" id="nameInput" placeholder="Name" maxlength="40" required>
+      <select id="monthInput"></select>
+      <input type="number" id="dayInput" placeholder="Day" min="1" max="31" required>
+      <button class="add" type="submit" id="addBtn">Add</button>
+      <p class="err" id="formErr"></p>
+    </form>
+
+    <div class="export-row">
+      <button class="export" id="exportBtn" type="button">Download .ics file</button>
+      <span class="export-note" id="exportNote"></span>
+    </div>
+    <div class="subscribe-box">
+      <b>Subscribe instead:</b> paste this URL into Google Calendar ("Other calendars" → "From URL") or Apple/Outlook Calendar to keep it always up to date:<br>
+      <span id="subscribeUrl"></span>
+    </div>
+    <p class="foot-note">Data is shared with everyone who visits this page.</p>
+  </div>
+</div>
+
+<script>
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS_IN_MONTH = [31,29,31,30,31,30,31,31,30,31,30,31];
+const PALETTE = [
+  {bg:"var(--pink)", d:"var(--pink-d)"},
+  {bg:"var(--mint)", d:"var(--mint-d)"},
+  {bg:"var(--lilac)", d:"var(--lilac-d)"},
+  {bg:"var(--peach)", d:"var(--peach-d)"},
+  {bg:"var(--sky)", d:"var(--sky-d)"},
+  {bg:"var(--butter)", d:"var(--butter-d)"}
+];
+
+let people = [];
+
+function monthSelect(){
+  const sel = document.getElementById('monthInput');
+  sel.innerHTML = MONTHS.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+}
+monthSelect();
+
+document.getElementById('subscribeUrl').textContent = window.location.origin + '/api/birthdays.ics';
+
+function nextOccurrence(month, day){
+  const now = new Date();
+  const y = now.getFullYear();
+  let candidate = new Date(y, month, Math.min(day, DAYS_IN_MONTH[month]));
+  const todayStart = new Date(y, now.getMonth(), now.getDate());
+  if(candidate < todayStart){
+    candidate = new Date(y+1, month, Math.min(day, DAYS_IN_MONTH[month]));
+  }
+  return Math.round((candidate - todayStart) / 86400000);
+}
+
+function whenLabel(days){
+  if(days === 0) return "today!";
+  if(days === 1) return "tomorrow";
+  return `in ${days}d`;
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function cupcakeSvg(colorBg, colorD, soon){
+  return `<svg class="cupc${soon ? ' glow' : ''}" viewBox="0 0 40 46" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9,44 L6,25 L34,25 L31,44 Z" fill="#FFF8F2" stroke="${colorD}" stroke-width="1.4"/>
+    <line x1="12" y1="27" x2="10" y2="42" stroke="${colorD}" stroke-width="1" opacity="0.4"/>
+    <line x1="20" y1="27" x2="20" y2="43" stroke="${colorD}" stroke-width="1" opacity="0.4"/>
+    <line x1="28" y1="27" x2="30" y2="42" stroke="${colorD}" stroke-width="1" opacity="0.4"/>
+    <ellipse cx="20" cy="20" rx="15" ry="9" fill="${colorBg}"/>
+    <ellipse cx="20" cy="13" rx="10" ry="7" fill="${colorBg}"/>
+    <ellipse cx="20" cy="7" rx="5.5" ry="4.5" fill="${colorBg}"/>
+    <circle cx="20" cy="4" r="2.4" fill="${colorD}"/>
+  </svg>`;
+}
+
+async function loadPeople(){
+  try{
+    const res = await fetch('/api/birthdays');
+    people = await res.json();
+  }catch(e){
+    people = [];
+  }
+  render();
+}
+
+function render(){
+  renderNext();
+  renderGrid();
+  renderList();
+}
+
+function renderNext(){
+  const row = document.getElementById('nextRow');
+  if(people.length === 0){
+    row.innerHTML = `<div class="next-empty">No birthdays yet — add your first teammate below.</div>`;
+    return;
+  }
+  const sorted = people
+    .map((p) => ({...p, days: nextOccurrence(p.month, p.day)}))
+    .sort((a,b) => a.days - b.days)
+    .slice(0, 4);
+
+  row.innerHTML = sorted.map(p => {
+    const pal = PALETTE[p.colorIdx % PALETTE.length];
+    const soon = p.days <= 14;
+    return `<div class="next-card">
+      ${cupcakeSvg(pal.bg, pal.d, soon)}
+      <div>
+        <div class="nc-name">${escapeHtml(p.name)}</div>
+        <div class="nc-when">${MONTHS[p.month].slice(0,3)} ${p.day} · ${whenLabel(p.days)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderGrid(){
+  const grid = document.getElementById('monthGrid');
+  const byMonth = Array.from({length:12}, () => []);
+  people.forEach((p) => byMonth[p.month].push(p));
+
+  grid.innerHTML = MONTHS.map((name, m) => {
+    const pal = PALETTE[m % PALETTE.length];
+    const items = byMonth[m].slice().sort((a,b) => a.day - b.day);
+    const inner = items.length
+      ? items.map(p => {
+          const ppal = PALETTE[p.colorIdx % PALETTE.length];
+          const soon = nextOccurrence(p.month, p.day) <= 14;
+          return `<div class="cc-item" title="${escapeHtml(p.name)}, ${name} ${p.day}">
+            ${cupcakeSvg(ppal.bg, ppal.d, soon)}
+            <div class="cc-name">${escapeHtml(p.name.split(' ')[0])}</div>
+          </div>`;
+        }).join('')
+      : `<span class="month-empty">Empty shelf</span>`;
+    return `<div class="month-card" style="background:${pal.bg}22;">
+      <p class="month-head" style="color:${pal.d}">${name}</p>
+      <div class="cupcakes">${inner}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderList(){
+  const list = document.getElementById('list');
+  document.getElementById('count').textContent = people.length ? `${people.length} ${people.length===1?'person':'people'}` : '';
+
+  if(people.length === 0){
+    list.innerHTML = `<div class="empty">No one's on the calendar yet.</div>`;
+    return;
+  }
+
+  const sorted = people
+    .map((p) => ({...p, days: nextOccurrence(p.month, p.day)}))
+    .sort((a,b) => a.days - b.days);
+
+  list.innerHTML = sorted.map(p => {
+    const cls = p.days === 0 ? 'today' : (p.days <= 14 ? 'soon' : '');
+    const pal = PALETTE[p.colorIdx % PALETTE.length];
+    return `<div class="person">
+      <span style="width:10px;height:10px;border-radius:50%;background:${pal.bg};border:1.5px solid ${pal.d};flex-shrink:0;"></span>
+      <span class="p-name">${escapeHtml(p.name)}</span>
+      <span class="p-date">${MONTHS[p.month].slice(0,3)} ${p.day}</span>
+      <span class="p-when ${cls}">${whenLabel(p.days)}</span>
+      <button class="del" data-id="${p.id}" aria-label="Remove ${escapeHtml(p.name)}">&times;</button>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      try{
+        await fetch(`/api/birthdays/${id}`, { method: 'DELETE' });
+        await loadPeople();
+      }catch(e){
+        btn.disabled = false;
+      }
+    });
+  });
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nameInput = document.getElementById('nameInput');
+  const monthInput = document.getElementById('monthInput');
+  const dayInput = document.getElementById('dayInput');
+  const err = document.getElementById('formErr');
+  const addBtn = document.getElementById('addBtn');
+
+  const name = nameInput.value.trim();
+  const month = parseInt(monthInput.value, 10);
+  const day = parseInt(dayInput.value, 10);
+
+  if(!name){
+    err.textContent = 'Enter a name first.';
+    err.style.display = 'block';
+    return;
+  }
+  if(!day || day < 1 || day > DAYS_IN_MONTH[month]){
+    err.textContent = `Enter a valid day for ${MONTHS[month]} (1–${DAYS_IN_MONTH[month]}).`;
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  addBtn.disabled = true;
+
+  try{
+    const res = await fetch('/api/birthdays', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, month, day })
+    });
+    if(!res.ok){
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Could not add teammate.');
+    }
+    nameInput.value = '';
+    dayInput.value = '';
+    await loadPeople();
+    nameInput.focus();
+  }catch(err2){
+    err.textContent = err2.message;
+    err.style.display = 'block';
+  }finally{
+    addBtn.disabled = false;
+  }
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  window.location.href = '/api/birthdays.ics';
+});
+
+loadPeople();
+</script>
+</body>
+</html>
